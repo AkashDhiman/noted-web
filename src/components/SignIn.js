@@ -14,7 +14,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 
-export default function SignIn() {
+export default function SignIn({ toggleAuth }) {
   return (
     <Flex
       minH={'100vh'}
@@ -65,6 +65,7 @@ export default function SignIn() {
                 _hover={{
                   bg: 'green.500',
                 }}
+                onClick={toggleAuth}
               >
                 Log In
               </Button>
@@ -75,6 +76,7 @@ export default function SignIn() {
                 _hover={{
                   bg: 'green.500',
                 }}
+                onClick={toggleAuth}
               >
                 Log In via Gmail
               </Button>
