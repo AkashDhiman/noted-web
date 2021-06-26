@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Noted",
+  "name": "Noted is an App for all your storage needs.",
   "icons": [
     {
       "src": "favicon.ico",
