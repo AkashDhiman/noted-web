@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button } from '@chakra-ui/react';
 
 import SignIn from './SignIn';
+import JournalScreen from './JournalScreen';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
@@ -11,7 +11,7 @@ const App = () => {
   };
 
   return isLoggedIn ? (
-    <Button onClick={toggleAuth}>Log Out</Button>
+    <JournalScreen toggleAuth={toggleAuth} />
   ) : (
     <SignIn toggleAuth={toggleAuth} />
   );
