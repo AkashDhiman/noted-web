@@ -1,6 +1,7 @@
 import React from 'react';
-import '../styles/App.css';
 
-const App = () => <p>Hello World</p>;
+import SignIn from './SignIn';
+
+const App = () => <SignIn />;
 
 export default App;
