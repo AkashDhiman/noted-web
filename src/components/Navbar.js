@@ -1,4 +1,5 @@
-import React from 'react';
+import React,{useContext} from 'react';
+import {auth} from '../utils/firebase'
 import {
   Box,
   Flex,
@@ -16,9 +17,9 @@ import {
   Input,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
-
+import { makeDiary } from '../utils/firebase';
 import logo from '../static/logo.png';
-
+import {UserContext} from '../providers/UserProvider'
 const links = [];
 
 const NavLink = ({ children }) => (
@@ -36,13 +37,23 @@ const NavLink = ({ children }) => (
   </Link>
 );
 
-export default function Navbar({ minW, maxW, toggleAuth, setJournal }) {
+export default function Navbar({ minW, maxW, toggleAuth, setJournal,currDiary,setCurrentDiary }) {
+  const [user] = useContext(UserContext)
+  const uid=user.data.uid
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isAddingJournal, setIsAddingJournal] = React.useState(false);
+  const [textBox,setTextBox]=React.useState('')
+  console.log(user)
 
-  const addJournal = (journal) => {
-    setJournal((prevState) => [...prevState, journal]);
-  };
+  const submitHandler=async ()=>{
+    var newDiary=await makeDiary(textBox,uid)
+    var newDiaryName=newDiary
+    newDiary={id:Math.random(),name:newDiaryName}
+    console.log(newDiary)
+    setJournal((prevState) => [...prevState, newDiary]);
+    setTextBox('')
+    setCurrentDiary(newDiaryName)
+  }
 
   return (
     <>
@@ -60,7 +71,10 @@ export default function Navbar({ minW, maxW, toggleAuth, setJournal }) {
               <Image boxSize={'50px'} src={logo} borderRadius={'full'} />
             </Box>
             <Text color={'green.400'} fontSize={'xl'} fontWeight={'bold'}>
-              Noted
+              Noted:
+            </Text>
+            <Text color={'green.400'} fontSize={'l'} fontWeight={'bold'}>
+              {currDiary}
             </Text>
             <HStack
               as={'nav'}
@@ -76,7 +90,10 @@ export default function Navbar({ minW, maxW, toggleAuth, setJournal }) {
             {isAddingJournal ? (
               <>
                 <FormControl id="journalName" mr={4}>
-                  <Input type="text" />
+                  <Input type="text" name="diaryName" 
+                  onChange={event => {
+                    console.log(event.currentTarget.value)
+                    setTextBox(event.currentTarget.value)}}/>
                 </FormControl>
                 <Button
                   mr={4}
@@ -87,12 +104,7 @@ export default function Navbar({ minW, maxW, toggleAuth, setJournal }) {
                   }}
                   color={'white'}
                   size={'sm'}
-                  onClick={() =>
-                    addJournal({
-                      id: Math.random(),
-                      name: 'Capture Input and call addJournal',
-                    })
-                  }
+                  onClick={submitHandler}
                 >
                   Add
                 </Button>
@@ -136,10 +148,13 @@ export default function Navbar({ minW, maxW, toggleAuth, setJournal }) {
               size={'sm'}
               mr={4}
               p={4}
-              onClick={toggleAuth}
+              onClick={()=>{auth.signOut()}}
             >
               Log Out
             </Button>
+            <Text color={'green.400'} fontSize={'sm'} paddingRight={'3px'} >
+              {user.data.name}
+            </Text>
             <Avatar size={'sm'} />
           </Flex>
         </Flex>

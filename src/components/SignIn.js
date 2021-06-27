@@ -13,7 +13,7 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-
+import { signInWithGoogle } from '../utils/firebase';
 export default function SignIn({ toggleAuth }) {
   return (
     <Flex
@@ -76,7 +76,9 @@ export default function SignIn({ toggleAuth }) {
                 _hover={{
                   bg: 'green.500',
                 }}
-                onClick={toggleAuth}
+                onClick={()=>{
+                  signInWithGoogle()
+                  toggleAuth}}
               >
                 Log In via Gmail
               </Button>

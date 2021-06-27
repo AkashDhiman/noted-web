@@ -3,7 +3,7 @@ import { Center, VStack } from '@chakra-ui/react';
 
 import JournalCard from './JournalCard';
 
-const JournalList = ({ journals }) => {
+const JournalList = ({ journals,setCurrentDiary}) => {
   return (
     <VStack
       minW={'400px'}
@@ -25,7 +25,7 @@ const JournalList = ({ journals }) => {
         All Journals
       </Center>
       {journals.map((journal) => (
-        <JournalCard journal={journal} key={journal.id} />
+        <JournalCard journal={journal} setCurrentDiary={setCurrentDiary} key={journal.id} />
       ))}
     </VStack>
   );
