@@ -1,21 +1,20 @@
 /* TODO: break this file into smaller segments */
-import firebase from "firebase/app";
-import "firebase/auth";
-import "firebase/analytics";
-import "firebase/firestore";
-import "firebase/storage";
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/analytics';
+import 'firebase/firestore';
+import 'firebase/storage';
 
-import axios from "axios";
-
+import axios from 'axios';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCU3XcDrZKAvF7CgkGc4gpul_Crzen5BqE",
-  authDomain: "memsave-c0d28.firebaseapp.com",
-  projectId: "memsave-c0d28",
-  storageBucket: "memsave-c0d28.appspot.com",
-  messagingSenderId: "830067013642",
-  appId: "1:830067013642:web:d2c5a0e6a4d32bfcf987f3",
-  measurementId: "G-ZD4M3DR1PR",
+  apiKey: 'AIzaSyCU3XcDrZKAvF7CgkGc4gpul_Crzen5BqE',
+  authDomain: 'memsave-c0d28.firebaseapp.com',
+  projectId: 'memsave-c0d28',
+  storageBucket: 'memsave-c0d28.appspot.com',
+  messagingSenderId: '830067013642',
+  appId: '1:830067013642:web:d2c5a0e6a4d32bfcf987f3',
+  measurementId: 'G-ZD4M3DR1PR',
 };
 // Initialize Firebasez
 firebase.initializeApp(firebaseConfig);
@@ -24,13 +23,14 @@ const db = firebase.firestore();
 var storage = firebase.storage();
 var storageRef = storage.ref();
 export const providerGoogle = new firebase.auth.GoogleAuthProvider();
-export const providerEmail=new firebase.auth.EmailAuthProvider();
+export const providerEmail = new firebase.auth.EmailAuthProvider();
 
 export const auth = firebase.auth();
-export const signInWithGoogle = async () =>await auth.signInWithPopup(providerGoogle);
-export const makeCredential=(email,password)=>{
-  return firebase.auth.EmailAuthProvider.credential(email,password)
-}
+export const signInWithGoogle = async () =>
+  await auth.signInWithPopup(providerGoogle);
+export const makeCredential = (email, password) => {
+  return firebase.auth.EmailAuthProvider.credential(email, password);
+};
 
 export const createUserProfileDocument = async (user, userInfo) => {
   //userinfo -- name and phone
@@ -42,13 +42,17 @@ export const createUserProfileDocument = async (user, userInfo) => {
     const createdAt = new Date();
     const { displayName, email, photoURL } = user;
     try {
-      const isSetup=auth.currentUser.providerData[0].providerId===providerGoogle.providerId? true:false
+      const isSetup =
+        auth.currentUser.providerData[0].providerId ===
+        providerGoogle.providerId
+          ? true
+          : false;
       await userRef.set({
         createdAt,
         name: displayName,
         email,
         photoURL,
-        setup:isSetup,
+        setup: isSetup,
         ...userInfo,
       });
     } catch (error) {
@@ -61,7 +65,7 @@ export const createUserProfileDocument = async (user, userInfo) => {
 export const getUserDocument = async (uid) => {
   if (!uid) return null;
   try {
-    const userDoc = await db.collection("users").doc(uid).get();
+    const userDoc = await db.collection('users').doc(uid).get();
     return { uid, ...userDoc.data() };
   } catch (error) {
     console.log(error.message);
@@ -70,12 +74,12 @@ export const getUserDocument = async (uid) => {
 
 //DIARY
 export const retrieveDiaryNames = async (userName) => {
-  console.log("retrieveDiaryNames function");
+  console.log('retrieveDiaryNames function');
   const list = [];
   const dataSnapshot = await db
-    .collection("users")
+    .collection('users')
     .doc(userName)
-    .collection("diaries")
+    .collection('diaries')
     .get();
   dataSnapshot.forEach((doc) => {
     list.push(doc.id);
@@ -84,30 +88,27 @@ export const retrieveDiaryNames = async (userName) => {
   return list;
 };
 
-
 export const isDiaryNameUnique = async (diaryName, userName) => {
-  console.log("isDiaryNameUnique function");
+  console.log('isDiaryNameUnique function');
   const list = await retrieveDiaryNames(userName);
   if (!list.includes(diaryName)) return true;
   else return false;
 };
 
-
 export const makeDiary = async (diaryName, userName) => {
-  console.log("makeDiary function");
-  console.log(diaryName)
-  var isUnique=await isDiaryNameUnique(diaryName,userName)
-  if(!isUnique)
-  {
-    diaryName=diaryName+"1"
+  console.log('makeDiary function');
+  console.log(diaryName);
+  var isUnique = await isDiaryNameUnique(diaryName, userName);
+  if (!isUnique) {
+    diaryName = diaryName + '1';
   }
   await db
-    .collection("users")
+    .collection('users')
     .doc(userName)
-    .collection("diaries")
+    .collection('diaries')
     .doc(diaryName)
     .set({ data: [] });
-  return diaryName
+  return diaryName;
 };
 
 //USED
@@ -118,7 +119,7 @@ export const addMessageToDiary = async (userName, diaryName, userInput) => {
   // console.log(data);
   data.push({ time: Date.now(), data: userInput });
   await docRef.set({ data }, { merge: true });
-  return data
+  return data;
 
   //add message to the diary's array
 };
@@ -132,9 +133,8 @@ export const reviewDiary = async (userName, diaryName) => {
   return data;
 };
 
-
 export const uploadAttachment = async (userName, result) => {
-  console.log("uploadAttachment function");
+  console.log('uploadAttachment function');
 
   const name = result[0].name;
   const contentType = result[0].contentType;
@@ -142,21 +142,21 @@ export const uploadAttachment = async (userName, result) => {
 
   const ref = storageRef.child(`users/${userName}/attachments/${name}`);
 
-  const response = await axios.get(contentUrl, { responseType: "arraybuffer" });
+  const response = await axios.get(contentUrl, { responseType: 'arraybuffer' });
   // If user uploads JSON file, this prevents it from being written as "{"type":"Buffer","data":[123,13,10,32,32,34,108..."
-  if (response.headers["content-type"] === "application/json") {
+  if (response.headers['content-type'] === 'application/json') {
     response.data = JSON.parse(response.data, (key, value) => {
-      return value && value.type === "Buffer" ? Buffer.from(value.data) : value;
+      return value && value.type === 'Buffer' ? Buffer.from(value.data) : value;
     });
   }
 
   console.log(response.data);
   let bytes = new Uint8Array(response.data);
-  console.log("works");
+  console.log('works');
 
   // here we needs to send a loading message
   ref.put(bytes).then((snapshot) => {
-    console.log("Uploaded a file!");
+    console.log('Uploaded a file!');
   });
   // var metadata = {
   //   name,
@@ -167,15 +167,14 @@ export const uploadAttachment = async (userName, result) => {
   // });
 };
 
-
 export const retrieveAttachments = async (userName) => {
-  console.log("retrieve Attachments function");
+  console.log('retrieve Attachments function');
   const ref = storageRef.child(`users/${userName}/attachments`);
-  var ans=[]
+  var ans = [];
   await ref
     .listAll()
     .then(async (res) => {
-      console.log("pushing paths into array");
+      console.log('pushing paths into array');
       const result = [];
       await res.items.forEach((itemRef) => {
         // console.log(itemRef._delegate._location.path_)
@@ -184,61 +183,59 @@ export const retrieveAttachments = async (userName) => {
       return result;
     })
     .then(async (arr) => {
-      console.log(arr)
-      const result=[]
-      console.log("pushing urls into array");
+      console.log(arr);
+      const result = [];
+      console.log('pushing urls into array');
 
       const promises = arr.map(async (path) => {
-        const names=path.split("/")
-        const fileName=names[names.length-1]
-        const fileNameParts=fileName.split(".")
-        const fileType=fileNameParts[fileNameParts.length-1]
-        console.log("check after split")
-        console.log(names)
-        await storageRef.child(path).getDownloadURL()
+        const names = path.split('/');
+        const fileName = names[names.length - 1];
+        const fileNameParts = fileName.split('.');
+        const fileType = fileNameParts[fileNameParts.length - 1];
+        console.log('check after split');
+        console.log(names);
+        await storageRef
+          .child(path)
+          .getDownloadURL()
           .then(async (url) => {
-            await result.push({url,fileName,fileType})
+            await result.push({ url, fileName, fileType });
           });
+      });
 
-      })
+      const contents = await Promise.all(promises);
 
-      const contents = await Promise.all(promises)
-
-   
-      return result
-    }).then((result)=>{
-      console.log("checking final data sent")
-      console.log(result)
-      ans=result
-      return result
+      return result;
+    })
+    .then((result) => {
+      console.log('checking final data sent');
+      console.log(result);
+      ans = result;
+      return result;
     });
-    console.log("ans is ")
-    console.log(ans)
-    return ans
+  console.log('ans is ');
+  console.log(ans);
+  return ans;
 };
-
 
 //USED
 export const retrieveChatDump = async (userName) => {
   // just get array of chats
-    // will give the content arrays
-    console.log("retrieve Chat Dump")
-    const docRef = db.doc(`users/${userName}/chatDump/chatDump`);
-    const doc = await docRef.get();
-    if(!doc.exists)
-    {
-      console.log("doc does not exist")
-      await docRef.set({data:[]})
-    }
-    const data = doc.data().data;
-   
-    return data;
+  // will give the content arrays
+  console.log('retrieve Chat Dump');
+  const docRef = db.doc(`users/${userName}/chatDump/chatDump`);
+  const doc = await docRef.get();
+  if (!doc.exists) {
+    console.log('doc does not exist');
+    await docRef.set({ data: [] });
+  }
+  const data = doc?.data().data;
 
+  return data;
 };
 
 //USED
-export const addMessageToChatDump=async(userName,userInput)=>{
-  console.log("add message to chat dump function ")
+export const addMessageToChatDump = async (userName, userInput) => {
+  console.log('add message to chat dump function ');
   const docRef = db.doc(`users/${userName}/chatDump/chatDump`);
   const doc = await docRef.get();
   // if(!doc.exists)
@@ -249,7 +246,5 @@ export const addMessageToChatDump=async(userName,userInput)=>{
   // console.log(data);
   data.push({ time: Date.now(), data: userInput });
   await docRef.set({ data }, { merge: true });
-  return data
-}
-
-
+  return data;
+};

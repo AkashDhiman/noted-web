@@ -1,39 +1,42 @@
 import React, { useContext } from 'react';
 import { Input, FormControl, FormErrorMessage, Button } from '@chakra-ui/react';
 import { Formik, Form, Field } from 'formik';
-import { addMessageToDiary,addMessageToChatDump } from '../utils/firebase';
-import {UserContext} from '../providers/UserProvider'
-var x=30
-const ComposeBox = ({ currDiary,setMessages }) => {
-  const [user]=useContext(UserContext)
-  const uid=user.data.uid
+import { addMessageToDiary, addMessageToChatDump } from '../utils/firebase';
+import { UserContext } from '../providers/UserProvider';
+
+const ComposeBox = ({ currDiary, setMessages }) => {
+  const [user] = useContext(UserContext);
+  const uid = user.data.uid;
   return (
     <Formik
       initialValues={{ message: '' }}
       onSubmit={async (values) => {
-        console.log("clicked submit")
-        console.log(values.message) 
-        var messsages=[]
-        var doc=null
-        if(currDiary!='chatDump')
-        {
-          doc=await addMessageToDiary(uid,currDiary,values.message)
-          for (var idx in doc)
-          {
-            messsages.push({id:doc[idx].time,text:doc[idx].data,type:"text"})
+        console.log('clicked submit');
+        console.log(values.message);
+        var messsages = [];
+        var doc = null;
+        if (currDiary != 'chatDump') {
+          doc = await addMessageToDiary(uid, currDiary, values.message);
+          for (var idx in doc) {
+            messsages.push({
+              id: doc[idx].time,
+              text: doc[idx].data,
+              type: 'text',
+            });
           }
-          setMessages(messsages)
-        }
-        else{
-          doc=await addMessageToChatDump(uid,values.message)
-          for (var idx2 in doc)
-          {
-            messsages.push({id:doc[idx2].time,text:doc[idx2].data,type:"text"})
+          setMessages(messsages);
+        } else {
+          doc = await addMessageToChatDump(uid, values.message);
+          for (var idx2 in doc) {
+            messsages.push({
+              id: doc[idx2].time,
+              text: doc[idx2].data,
+              type: 'text',
+            });
           }
-          setMessages(messsages)
+          setMessages(messsages);
         }
-        values.message=""
-        
+        values.message = '';
       }}
     >
       <Form>

@@ -1,9 +1,8 @@
-import React,{useContext} from 'react';
+import React, { useContext } from 'react';
 
 import SignIn from './SignIn';
 import JournalScreen from './JournalScreen';
-import { UserContext } from "../providers/UserProvider";
-
+import { UserContext } from '../providers/UserProvider';
 
 const App = () => {
   const [user] = useContext(UserContext);
@@ -14,19 +13,15 @@ const App = () => {
     setIsLoggedIn((prevState) => !prevState);
   };
 
-  if(user.loading)
-  {
-    return <h1>Loading...</h1>
+  if (user.loading) {
+    return <h1>Loading...</h1>;
+  } else {
+    return user.data ? (
+      <JournalScreen toggleAuth={toggleAuth} />
+    ) : (
+      <SignIn toggleAuth={toggleAuth} />
+    );
   }
-  else{
-    return user.data?(<JournalScreen toggleAuth={toggleAuth} />):
-    (<SignIn toggleAuth={toggleAuth} />)
-  }
-  // return isLoggedIn ? (
-  //   <JournalScreen toggleAuth={toggleAuth} />
-  // ) : (
-  //   <SignIn toggleAuth={toggleAuth} />
-  // );
 };
 
 export default App;
